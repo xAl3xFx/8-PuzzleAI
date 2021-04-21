@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>8-puzzle</title>
+    <script src="index2.js" ></script>
+    <script src="index.js" ></script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+
+<main>
+    <header>
+        <h1>8 Puzzle - AI</h1>
+    </header>
+    <div id="canvasWrapper">
+        <canvas id="myCanvas" width="400" height="400"></canvas>
+    </div>
+    <div id="buttonsWrapper">
+        <button onclick="generateRandomGrid()">Randomize Grid</button>
+        <button id="startOrPause" onclick="paused ? start() : pause()">Start</button>
+    </div>
+    <div id="algorithmWrapper">
+        <div style="margin-right: 1rem">
+            <h3>Algorithm</h3>
+            <label for="alg-AStar">A*</label>
+            <input checked onchange="changeAlgorithm(this)" id="alg-AStar" type="radio" name="alg" value="AStar">
+            <br>
+            <label for="alg-BFS">Breadth First Search</label>
+            <input id="alg-BFS" onchange="changeAlgorithm(this)" type="radio" name="alg" value="BFS">
+        </div>
+        <div style="margin-left: 1rem">
+            <h3>Heuristic</h3>
+            <label for="heu-manhattan">Manhattan Distance</label>
+            <input checked id="heu-manhattan" onchange="changeHeuristic(this)" type="radio" name="heu" value="manhattan">
+            <br>
+            <label for="alg-misPlacedTiles">Misplaced Tiles</label>
+            <input id="alg-misPlacedTiles" onchange="changeHeuristic(this)" type="radio" name="heu" value="misPlacedTiles">
+        </div>
+    </div>
+    <section id="infoSection">
+        <h1 id="loading"></h1>
+    </section>
+
+
+</main>
+
+</body>
+</html>
