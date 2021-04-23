@@ -56,10 +56,12 @@ const solve = async () => {
     const grid = constructGridFromHash(currentState);
     let result;
     if(algorithm === "AStar"){
+        console.log(grid);
         result = await AStar(grid, heuristic);
         setLoading(false, result.operations, result.moves);
     }else{
-        console.log("BFS not implemented");
+        result = await bestFirstSearch(grid, heuristic);
+        setLoading(false, result.operations, result.moves);
     }
 
     for(let i=0; i < result.path.length; i++){
@@ -77,7 +79,36 @@ const setLoading = (loading, operations, moves) => {
         ctx.clearRect(0, 0, 400, 400);
         ctx.fillText("Loading", 100, 100);
     }else{
-        document.getElementById("loading").innerText = `Solution found! Total moves: ${moves}. Total operations ${operations}`;
+        document.getElementById("loading").innerText = `Solution found! Total moves: ${moves}`;
+    }
+};
+
+const loadGrid = (gridNumber) => {
+    switch (gridNumber) {
+        case 0: {
+            currentGrid = grid0;
+            currentState = generateHashForGrid(currentGrid);
+            drawBoard(currentState);
+            break;
+        }
+        case 1: {
+            currentGrid = grid1;
+            currentState = generateHashForGrid(currentGrid);
+            drawBoard(currentState);
+            break;
+        }
+        case 2: {
+            currentGrid = grid2;
+            currentState = generateHashForGrid(currentGrid);
+            drawBoard(currentState);
+            break;
+        }
+        case 3: {
+            currentGrid = grid3;
+            currentState = generateHashForGrid(currentGrid);
+            drawBoard(currentState);
+            break;
+        }
     }
 };
 

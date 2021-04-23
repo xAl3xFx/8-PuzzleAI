@@ -13,6 +13,11 @@ header{
     margin: auto;
 }
 
+header h3{
+    margin: auto;
+    text-align: center;
+}
+
 #canvasWrapper{
     display: flex;
     justify-content: center;
@@ -36,4 +41,14 @@ header{
 
 #infoSection{
     margin: 1rem auto 0 auto;
+}
+
+#gridsWrapper{
+    margin: 1rem auto 0 auto;
+    display: flex;
+}
+
+
+#gridsWrapper button{
+    margin: 0 0.5rem;
 }

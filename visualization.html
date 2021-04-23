@@ -13,6 +13,7 @@
 <main>
     <header>
         <h1>8 Puzzle - AI</h1>
+        <h3>By Alex Petrov</h3>
     </header>
     <div id="canvasWrapper">
         <canvas id="myCanvas" width="400" height="400"></canvas>
@@ -27,7 +28,7 @@
             <label for="alg-AStar">A*</label>
             <input checked onchange="changeAlgorithm(this)" id="alg-AStar" type="radio" name="alg" value="AStar">
             <br>
-            <label for="alg-BFS">Breadth First Search</label>
+            <label for="alg-BFS">Best First Search</label>
             <input id="alg-BFS" onchange="changeAlgorithm(this)" type="radio" name="alg" value="BFS">
         </div>
         <div style="margin-left: 1rem">
@@ -38,6 +39,12 @@
             <label for="alg-misPlacedTiles">Misplaced Tiles</label>
             <input id="alg-misPlacedTiles" onchange="changeHeuristic(this)" type="radio" name="heu" value="misPlacedTiles">
         </div>
+    </div>
+    <div id="gridsWrapper">
+        <button onclick="loadGrid(0)">Grid 0</button>
+        <button onclick="loadGrid(1)">Grid 1</button>
+        <button onclick="loadGrid(2)">Grid 2</button>
+        <button onclick="loadGrid(3)">Grid 3</button>
     </div>
     <section id="infoSection">
         <h1 id="loading"></h1>

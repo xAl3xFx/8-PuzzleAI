@@ -1,6 +1,4 @@
 const reconstructPath = (start, cameFrom, current, operations) => {
-    const totalPath = [current];
-    //TODO : Implement this
     console.log(`Win with ${operations} operations`);
     console.dir(cameFrom[current]);
 
@@ -8,20 +6,15 @@ const reconstructPath = (start, cameFrom, current, operations) => {
     const path = [];
 
     const countMoves = (state) => {
-        moves++;
         path.unshift(state);
-        // await setTimeout(() => 0, 500);
         if(state === start) return;
+        moves++;
         if(cameFrom[state] !== undefined)
             countMoves(cameFrom[state]);
     };
     countMoves(current);
 
     return {path, moves, operations};
-
-    // console.log(`Win with ${moves} moves`);
-
-    // return [];
 };
 
 const constructGridFromHash = (gridHash) => {
@@ -96,10 +89,6 @@ const countInversions = (array) => {
     return invCount;
 };
 
-//012345678
-
-//8 + 2 + 4 + 1
-
 const generateGrid = () => {
     //Generate random tiles order
     let tiles = [];
@@ -122,10 +111,6 @@ const generateGrid = () => {
     return grid;
 };
 
-// const generateScoreTables = (grid) => (new Array(9).fill(0)).reduce((acc, _, index) => {acc[index] = Infinity; return acc}, {});
-
-const checkAllTilesInPlace = (gridState) => Object.keys(gridState).reduce((acc, el) => acc && parseInt(el) === gridState[el].id, true);
-
 const countMissPlacedTiles = (gridHash) => gridHash.split("").reduce((acc,elem, index) => parseInt(elem) !== index ? acc + 1 : acc, 0);
 
 const manhattan = (gridHash) => {
@@ -146,6 +131,60 @@ const manhattan = (gridHash) => {
 
 const generateHashForGrid = (grid) => {
     return grid.reduce((acc, tile) => acc + tile.id, "");
+};
+
+const bestFirstSearch = (start, heuristic) => {
+    const h = heuristic === "manhattan" ? manhattan : countMissPlacedTiles;
+    let operations = 0;
+    const startHash = generateHashForGrid(start);
+    // The set of discovered nodes that may need to be (re-)expanded.
+    // Initially, only the start node is known.
+    // This is usually implemented as a min-heap or priority queue rather than a hash-set.
+    let openSet = [startHash];
+
+    // For node n, cameFrom[n] is the node immediately preceding it on the cheapest path from start
+    // to n currently known.
+    const cameFrom = {};
+
+    // For node n, fScore[n] := gScore[n] + h(n). fScore[n] represents our current best guess as to
+    // how short a path from start to finish can be if it goes through n.
+    // const fScore = generateScoreTables(); //map with default value of Infinity
+    const fScore = {};
+    fScore[startHash] = 0;
+
+    const visited = [];
+
+    while (openSet.length > 0){
+        // This operation can occur in O(1) time if openSet is a min-heap or a priority queue
+        const current = openSet.filter(el => !visited.includes(el)).reduce((acc, gridHash) => fScore[gridHash] <= fScore[acc] ? gridHash : acc, openSet[0]);
+        if(!visited.includes(current)) visited.push(current);
+
+        if(current === "012345678")
+            return reconstructPath(startHash, cameFrom, current, operations);
+
+        operations++;
+        if(operations % 1000 === 0) console.log(`${operations} operations reached.`)
+
+        openSet = openSet.filter(el => el !== current);
+
+        for(let neighbour of getNeighbours(current)){
+            if(fScore[neighbour] === undefined) fScore[neighbour] = fScore[current];
+            // d(current,neighbor) is the weight of the edge from current to neighbor
+            // tentative_gScore is the distance from start to the neighbor through current
+            const distance = 1; //The cost of each move si 1
+            fScore[neighbour] = h(neighbour);
+
+            if (!openSet.find(el => el === neighbour) && !visited.includes(neighbour)) {
+                openSet.push(neighbour);
+                cameFrom[neighbour] = current;
+            }
+        }
+    }
+
+    //OpenSet is empty and path was not found
+    //Since this game always has solution, this return
+    //statement is not supposed to be reached.
+    return false;
 };
 
 const AStar = (start, heuristic) => {
@@ -211,10 +250,9 @@ const AStar = (start, heuristic) => {
     return false;
 };
 
-
-
 // const grid = generateGrid();
-const grid1 = [
+
+const grid0 = [
     { id: 1, x: 0, y: 0 },
     { id: 2, x: 1, y: 0 },
     { id: 0, x: 2, y: 0 },
@@ -226,87 +264,38 @@ const grid1 = [
     { id: 8, x: 2, y: 2 }
 ];
 
-const grid2 = [
-    { id: 1, x: 0, y: 0 },
-    { id: 2, x: 1, y: 0 },
-    { id: 5, x: 2, y: 0 },
-    { id: 3, x: 0, y: 1 },
-    { id: 4, x: 1, y: 1 },
-    { id: 0, x: 2, y: 1 },
-    { id: 6, x: 0, y: 2 },
+const grid1 = [
+    { id: 0, x: 0, y: 0 },
+    { id: 3, x: 1, y: 0 },
+    { id: 4, x: 2, y: 0 },
+    { id: 1, x: 0, y: 1 },
+    { id: 6, x: 1, y: 1 },
+    { id: 5, x: 2, y: 1 },
+    { id: 8, x: 0, y: 2 },
     { id: 7, x: 1, y: 2 },
-    { id: 8, x: 2, y: 2 }
+    { id: 2, x: 2, y: 2 }
+];
+
+const grid2 = [
+    { id: 0, x: 0, y: 0 },
+    { id: 7, x: 1, y: 0 },
+    { id: 3, x: 2, y: 0 },
+    { id: 5, x: 0, y: 1 },
+    { id: 8, x: 1, y: 1 },
+    { id: 1, x: 2, y: 1 },
+    { id: 2, x: 0, y: 2 },
+    { id: 6, x: 1, y: 2 },
+    { id: 4, x: 2, y: 2 }
 ];
 
 const grid3 = [
-    { id: 1, x: 0, y: 0 },
-    { id: 2, x: 1, y: 0 },
-    { id: 5, x: 2, y: 0 },
-    { id: 3, x: 0, y: 1 },
-    { id: 0, x: 1, y: 1 },
-    { id: 4, x: 2, y: 1 },
-    { id: 6, x: 0, y: 2 },
-    { id: 7, x: 1, y: 2 },
-    { id: 8, x: 2, y: 2 }
-];
-
-const grid4 = [
-    { id: 1, x: 0, y: 0 },
-    { id: 2, x: 1, y: 0 },
-    { id: 3, x: 2, y: 0 },
-    { id: 0, x: 0, y: 1 },
-    { id: 5, x: 1, y: 1 },
-    { id: 4, x: 2, y: 1 },
-    { id: 6, x: 0, y: 2 },
-    { id: 7, x: 1, y: 2 },
-    { id: 8, x: 2, y: 2 }
-];
-
-const grid5 = [
-    { id: 4, x: 0, y: 0 },
-    { id: 7, x: 1, y: 0 },
+    { id: 0, x: 0, y: 0 },
+    { id: 3, x: 1, y: 0 },
     { id: 5, x: 2, y: 0 },
     { id: 1, x: 0, y: 1 },
-    { id: 6, x: 1, y: 1 },
-    { id: 2, x: 2, y: 1 },
-    { id: 0, x: 0, y: 2 },
-    { id: 8, x: 1, y: 2 },
-    { id: 3, x: 2, y: 2 }
+    { id: 7, x: 1, y: 1 },
+    { id: 8, x: 2, y: 1 },
+    { id: 2, x: 0, y: 2 },
+    { id: 6, x: 1, y: 2 },
+    { id: 4, x: 2, y: 2 }
 ];
-
-const grid6 = [
-    { id: 3, x: 0, y: 0 },
-    { id: 8, x: 1, y: 0 },
-    { id: 1, x: 2, y: 0 },
-    { id: 6, x: 0, y: 1 },
-    { id: 5, x: 1, y: 1 },
-    { id: 4, x: 2, y: 1 },
-    { id: 0, x: 0, y: 2 },
-    { id: 2, x: 1, y: 2 },
-    { id: 7, x: 2, y: 2 }
-];
-
-
-
-// const currentGrid = grid6;
-// console.log(currentGrid);
-//
-// drawBoard(generateHashForGrid(currentGrid));
-// const start = currentGrid.find(el => el.id === 0);
-// AStar(currentGrid, heuristic);
-
-//147823056
-//---------
-//012345678
-
-//012345678
-
-//0 : 6
-//1 : 0
-//2 : 3
-//3 : 3
-//4 : 0
-//5 : 2
-//6 : 2
-//7 : 1
-//Total : 17
